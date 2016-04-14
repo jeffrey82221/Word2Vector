@@ -162,6 +162,11 @@ with graph.as_default():
   # Compute the average NCE loss for the batch.
   # tf.nce_loss automatically draws a new sample of the negative labels each
   # time we evaluate the loss.
+  print("embed",embed)
+  print("train_labels",train_labels)
+  print("train_labels",train_labels)
+  print("nce_biases",nce_biases)
+  print("embeddings",embeddings)
   loss = tf.reduce_mean(
       tf.nn.nce_loss(embeddings, nce_biases, embed, train_labels,
                      num_sampled, vocabulary_size))
