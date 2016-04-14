@@ -145,6 +145,15 @@ graph = tf.Graph()
 
 
 sess = tf.InteractiveSession()
+#train_inputs = train_inputs: batch_inputs, train_labels: batch_labels
+
+
+
+
+
+
+
+
 
 # Some tensor we want to print the value of
 
@@ -161,11 +170,11 @@ with graph.as_default():
 
     # Ops and variables pinned to the CPU because of missing GPU implementation
     with tf.device('/cpu:0'):
-        train_input_small = tf.split(1, num_skips, tf.transpose(
-            tf.reshape(train_inputs, [num_skips, batch_size/num_skips]),perm=[1, 0]))[0]
+        train_input_small = tf.split(0, num_skips, tf.transpose(
+            tf.reshape(train_inputs, [batch_size/num_skips, num_skips]),perm=[1, 0]))[0]
 
-        train_labels_array = tf.split(1, num_skips, tf.transpose(
-            tf.reshape(train_labels, [num_skips, batch_size/num_skips]),perm=[1, 0]))
+        train_labels_array = tf.split(0, num_skips, tf.transpose(
+            tf.reshape(train_labels, [batch_size/num_skips,num_skips]),perm=[1, 0]))
         # Look up embeddings for inputs.
         embeddings = tf.Variable(
             tf.random_uniform([vocabulary_size, embedding_size], -1.0, 1.0))
@@ -187,7 +196,7 @@ with graph.as_default():
 
         for i in range(num_skips):
 
-            nce_loss_array.append(tf.nn.nce_loss(nce_weights_array[i], nce_biases_array[i], embed, train_labels_array[i],num_sampled, vocabulary_size))
+            nce_loss_array.append(tf.nn.nce_loss(nce_weights_array[i], nce_biases_array[i], embed, tf.transpose(train_labels_array[i]),num_sampled, vocabulary_size))
 
             if(loss_sum == None):
                 loss_sum = nce_loss_array[i]
