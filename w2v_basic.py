@@ -245,7 +245,7 @@ with tf.Session(graph=graph) as session:
         # steps)
         if step % 10000 == 0:
             sim = similarity.eval()
-            
+
             print("For the desire embedding:")
             for i in xrange(valid_size):
                 valid_word = reverse_dictionary[valid_examples[i]]
