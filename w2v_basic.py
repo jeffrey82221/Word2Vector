@@ -170,8 +170,8 @@ with graph.as_default():
   # Compute the cosine similarity between minibatch examples and all embeddings.
   norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
   normalized_embeddings = embeddings / norm
-  norm = tf.sqrt(tf.reduce_sum(tf.square(nce_weights), 1, keep_dims=True))
-  normalized_nce_weights = nce_weights / norm
+  nce_norm = tf.sqrt(tf.reduce_sum(tf.square(nce_weights), 1, keep_dims=True))
+  normalized_nce_weights = nce_weights / nce_norm
   valid_embeddings = tf.nn.embedding_lookup(
       normalized_embeddings, valid_dataset)
   valid_nce_embeddings = tf.nn.embedding_lookup(normalized_nce_weights,valid_dataset)

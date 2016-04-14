@@ -206,7 +206,7 @@ with tf.Session(graph=graph) as session:
     # Note that this is expensive (~20% slowdown if computed every 500 steps)
     if step % 10000 == 0:
       sim = similarity.eval()
-      nce_sim = nce_similarity.eval()
+      #nce_sim = nce_similarity.eval()
       print("For the desire embedding:")
       for i in xrange(valid_size):
         valid_word = reverse_dictionary[valid_examples[i]]
@@ -219,7 +219,7 @@ with tf.Session(graph=graph) as session:
         print(log_str)
 
   final_embeddings = normalized_embeddings.eval()
-  
+
 
 # Step 6: Visualize the embeddings.
 
