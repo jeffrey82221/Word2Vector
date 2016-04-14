@@ -123,8 +123,8 @@ for i in range(8):
 
 batch_size = 128
 embedding_size = 128  # Dimension of the embedding vector.
-skip_window = 2       # How many words to consider left and right.
-num_skips = 4         # How many times to reuse an input to generate a label.
+skip_window = 4       # How many words to consider left and right.
+num_skips = 8         # How many times to reuse an input to generate a label.
 
 # We pick a random validation set to sample nearest neighbors. Here we limit the
 # validation samples to the words that have a low numeric ID, which by
@@ -254,7 +254,7 @@ try:
   import matplotlib.pyplot as plt
 
   tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-  plot_only = 500
+  plot_only = 1000
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only,:])
   labels = [reverse_dictionary[i] for i in xrange(plot_only)]
   plot_with_labels(low_dim_embs, labels)

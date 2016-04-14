@@ -57,8 +57,10 @@ words = read_data(filename)
 print('Data size', len(words))
 
 # Step 2: Build the dictionary and replace rare words with UNK token.
-vocabulary_size = 50000
 
+# total number of vocabulary : 253854
+
+#total number of words 253854
 def build_dataset(words):
   count = [['UNK', -1]]
   count.extend(collections.Counter(words).most_common(vocabulary_size - 1))
@@ -243,7 +245,7 @@ try:
   import matplotlib.pyplot as plt
 
   tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-  plot_only = 500
+  plot_only = 1000
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only,:])
   labels = [reverse_dictionary[i] for i in xrange(plot_only)]
   plot_with_labels(low_dim_embs, labels)
