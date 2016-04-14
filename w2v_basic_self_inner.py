@@ -123,14 +123,14 @@ for i in range(8):
 
 batch_size = 128
 embedding_size = 128  # Dimension of the embedding vector.
-skip_window = 16       # How many words to consider left and right.
-num_skips = 32         # How many times to reuse an input to generate a label.
+skip_window = 2       # How many words to consider left and right.
+num_skips = 4         # How many times to reuse an input to generate a label.
 
 # We pick a random validation set to sample nearest neighbors. Here we limit the
 # validation samples to the words that have a low numeric ID, which by
 # construction are also the most frequent.
 valid_size = 16     # Random set of words to evaluate similarity on.
-valid_window = 100  # Only pick dev samples in the head of the distribution.
+valid_window = 500  # Only pick dev samples in the head of the distribution.
 valid_examples = np.array(random.sample(range(valid_window), valid_size))
 num_sampled = 64    # Number of negative examples to sample per batch (about half of batch size)
 
@@ -151,9 +151,9 @@ with graph.as_default():
     embed = tf.nn.embedding_lookup(embeddings, train_inputs)
 
     # Construct the variables for the NCE loss
-    nce_weights = tf.Variable(
-        tf.truncated_normal([vocabulary_size, embedding_size],
-                            stddev=1.0 / math.sqrt(embedding_size)))
+    #nce_weights = tf.Variable(
+    #    tf.truncated_normal([vocabulary_size, embedding_size],
+    #                        stddev=1.0 / math.sqrt(embedding_size)))
 
     nce_biases = tf.Variable(tf.zeros([vocabulary_size]))
 
@@ -161,7 +161,7 @@ with graph.as_default():
   # tf.nce_loss automatically draws a new sample of the negative labels each
   # time we evaluate the loss.
   loss = tf.reduce_mean(
-      tf.nn.nce_loss(nce_weights, nce_biases, embed, train_labels,
+      tf.nn.nce_loss(embeddings, nce_biases, embed, train_labels,
                      num_sampled, vocabulary_size))
 
   # Construct the SGD optimizer using a learning rate of 1.0.
@@ -170,15 +170,13 @@ with graph.as_default():
   # Compute the cosine similarity between minibatch examples and all embeddings.
   norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
   normalized_embeddings = embeddings / norm
-  norm = tf.sqrt(tf.reduce_sum(tf.square(nce_weights), 1, keep_dims=True))
-  normalized_nce_weights = nce_weights / norm
   valid_embeddings = tf.nn.embedding_lookup(
       normalized_embeddings, valid_dataset)
-  valid_nce_embeddings = tf.nn.embedding_lookup(normalized_nce_weights,valid_dataset)
+  #valid_nce_embeddings = tf.nn.embedding_lookup(normalized_nce_weights,valid_dataset)
   similarity = tf.matmul(
       valid_embeddings, normalized_embeddings, transpose_b=True)
-  nce_similarity = tf.matmul(
-      valid_nce_embeddings, normalized_nce_weights, transpose_b=True)
+  #nce_similarity = tf.matmul(
+  #      valid_nce_embeddings, normalized_nce_weights, transpose_b=True)
 # Step 5: Begin training.
 num_steps = 500001
 
@@ -219,18 +217,9 @@ with tf.Session(graph=graph) as session:
           close_word = reverse_dictionary[nearest[k]]
           log_str = "%s %s," % (log_str, close_word)
         print(log_str)
-      print("For the augemented embedding:")
-      for i in xrange(valid_size):
-        valid_word = reverse_dictionary[valid_examples[i]]
-        top_k = 8 # number of nearest neighbors
-        nearest = (-nce_sim[i, :]).argsort()[1:top_k+1]
-        log_str = "Nearest to %s:" % valid_word
-        for k in xrange(top_k):
-          close_word = reverse_dictionary[nearest[k]]
-          log_str = "%s %s," % (log_str, close_word)
-        print(log_str)
+
   final_embeddings = normalized_embeddings.eval()
-  final_embeddings2 = normalized_nce_weights.eval()
+  
 
 # Step 6: Visualize the embeddings.
 
