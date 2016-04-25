@@ -158,7 +158,11 @@ sess = tf.InteractiveSession()
 # Some tensor we want to print the value of
 
 # Add print operation
-
+def device_for_node(n):
+  if n.type == "MatMul":
+    return "/gpu:0"
+  else:
+    return "/cpu:0"
 
 with graph.as_default():
 
@@ -169,7 +173,7 @@ with graph.as_default():
     valid_dataset = tf.constant(valid_examples, dtype=tf.int32)
 
     # Ops and variables pinned to the CPU because of missing GPU implementation
-    with tf.device('/cpu:0'):
+    with graph.device(device_for_node):
         train_input_small = tf.split(0, num_skips, tf.transpose(
             tf.reshape(train_inputs, [batch_size/num_skips, num_skips]),perm=[1, 0]))[0]
 
