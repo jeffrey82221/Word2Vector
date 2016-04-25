@@ -151,18 +151,21 @@ sess = tf.InteractiveSession()
 
 
 
+import multiprocessing
 
 
 
 
 # Some tensor we want to print the value of
-
+cpu_device_count = 0
 # Add print operation
 def device_for_node(n):
-  if n.type == "MatMul":
+  if n.type == "MatMul" or n.type == "Sum" or n.type == "Add" or n.type == "reduce_sum":
     return "/gpu:0"
   else:
-    return "/cpu:0"
+    name = "/cpu:"+str(cpu_device_count)
+    cpu_device_count = (cpu_device_count + 1)%multiprocessing.cpu_count()
+    return name
 
 with graph.as_default():
 
