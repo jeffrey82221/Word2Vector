@@ -164,7 +164,7 @@ def device_for_node(n):
 
   if n.type == "MatMul" or n.type == "Sum" or n.type == "Add" or n.type == "reduce_sum":
     return "/gpu:0"
-  elif "Adam" in n.type:
+  elif n.type=="Adam_1":
     return "/cpu:0"
   else:
     name = "/cpu:"+str(device_for_node.cpu_device_count)
