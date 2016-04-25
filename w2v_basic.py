@@ -167,8 +167,8 @@ def device_for_node(n):
   elif n.type=="Adam_1":
     return "/cpu:0"
   else:
-    print "n.type = ",n.type,"device count = ",device_for_node.cpu_device_count
     name = "/cpu:"+str(device_for_node.cpu_device_count)
+    print n.type,name
     device_for_node.cpu_device_count = (device_for_node.cpu_device_count + 1)%multiprocessing.cpu_count()
     return name
 device_for_node.cpu_device_count = 0
