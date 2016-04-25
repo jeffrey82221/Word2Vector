@@ -160,16 +160,16 @@ import multiprocessing
 
 
 # Add print operation
+
 def device_for_node(n):
 
   if n.type == "MatMul" or n.type == "Sum" or n.type == "Add" or n.type == "reduce_sum":
     return "/gpu:0"
   else:
-    name = "/cpu:"+str(device_for_node.cpu_device_count)
-    print(n.type,name)
-    device_for_node.cpu_device_count = (device_for_node.cpu_device_count + 1)%multiprocessing.cpu_count()
+    name = "/cpu:0"
     return name
-device_for_node.cpu_device_count = 0
+
+
 with graph.as_default():
 
     # Input data.
@@ -217,13 +217,13 @@ with graph.as_default():
     # tf.nce_loss automatically draws a new sample of the negative labels each
     # time we evaluate the loss.
         loss = tf.reduce_mean(loss_sum)
-    with tf.device('/cpu:0'):
+
         # Construct the SGD optimizer using a learning rate of 1.0.
         optimizer = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
 
     # Compute the cosine similarity between minibatch examples and all
     # embeddings.
-    with graph.device(device_for_node):
+
         norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
         normalized_embeddings = embeddings / norm
 
