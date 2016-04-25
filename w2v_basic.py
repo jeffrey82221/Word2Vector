@@ -164,8 +164,6 @@ def device_for_node(n):
 
   if n.type == "MatMul" or n.type == "Sum" or n.type == "Add" or n.type == "reduce_sum":
     return "/gpu:0"
-  elif n.type=="Adam_1":
-    return "/cpu:0"
   else:
     name = "/cpu:"+str(device_for_node.cpu_device_count)
     print(n.type,name)
@@ -218,21 +216,22 @@ with graph.as_default():
     # Compute the average NCE loss for the batch.
     # tf.nce_loss automatically draws a new sample of the negative labels each
     # time we evaluate the loss.
-    loss = tf.reduce_mean(loss_sum)
-
-    # Construct the SGD optimizer using a learning rate of 1.0.
-    optimizer = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
+        loss = tf.reduce_mean(loss_sum)
+    with tf.device('/cpu:0'):
+        # Construct the SGD optimizer using a learning rate of 1.0.
+        optimizer = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
 
     # Compute the cosine similarity between minibatch examples and all
     # embeddings.
-    norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
-    normalized_embeddings = embeddings / norm
+    with graph.device(device_for_node):
+        norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
+        normalized_embeddings = embeddings / norm
 
-    valid_embeddings = tf.nn.embedding_lookup(
-        normalized_embeddings, valid_dataset)
+        valid_embeddings = tf.nn.embedding_lookup(
+            normalized_embeddings, valid_dataset)
 
-    similarity = tf.matmul(
-        valid_embeddings, normalized_embeddings, transpose_b=True)
+        similarity = tf.matmul(
+            valid_embeddings, normalized_embeddings, transpose_b=True)
 
 # Step 5: Begin training.
 num_steps = 500001
